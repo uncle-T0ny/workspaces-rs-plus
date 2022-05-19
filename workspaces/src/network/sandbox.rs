@@ -32,9 +32,9 @@ pub struct Sandbox {
 }
 
 impl Sandbox {
-    pub(crate) fn home_dir(port: u16) -> PathBuf {
-        let mut path = std::env::temp_dir();
-        path.push(format!("sandbox-{}", port));
+    pub(crate) fn home_dir(_port: u16) -> PathBuf {
+        let mut path = std::env::current_dir().unwrap();
+        path.push("state/sandbox");
         path
     }
 
@@ -45,9 +45,9 @@ impl Sandbox {
         InMemorySigner::from_file(&path)
     }
 
-    pub(crate) async fn new() -> anyhow::Result<Self> {
+    pub(crate) async fn new(is_reset_state: bool) -> anyhow::Result<Self> {
         let mut server = SandboxServer::default();
-        server.start()?;
+        server.start(is_reset_state)?;
         let client = Client::new(server.rpc_addr());
         client.wait_for_rpc().await?;
 

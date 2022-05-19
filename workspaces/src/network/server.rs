@@ -24,7 +24,7 @@ impl SandboxServer {
         }
     }
 
-    pub fn start(&mut self) -> anyhow::Result<()> {
+    pub fn start(&mut self, is_reset_state: bool) -> anyhow::Result<()> {
         if self.process.is_some() {
             anyhow::bail!("Sandbox server already started");
         }
@@ -35,9 +35,11 @@ impl SandboxServer {
         // Supress logs for the sandbox binary by default:
         supress_sandbox_logs_if_required();
 
-        // Remove dir if it already exists:
-        let _ = std::fs::remove_dir_all(&home_dir);
-        sandbox::init(&home_dir)?.wait()?;
+        if is_reset_state {
+            // Remove dir if it already exists:
+            let _ = std::fs::remove_dir_all(&home_dir);
+            sandbox::init(&home_dir)?.wait()?;
+        }
 
         let child = sandbox::run(&home_dir, self.rpc_port, self.net_port)?;
         info!(target: "workspaces", "Started sandbox: pid={:?}", child.id());
