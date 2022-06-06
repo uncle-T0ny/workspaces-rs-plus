@@ -136,12 +136,12 @@ impl Account {
     }
 
     /// Store the credentials of this account locally in the directory provided.
-    pub async fn store_credentials(&self, save_dir: impl AsRef<Path>) -> anyhow::Result<()> {
+    pub async fn store_credentials(&self, save_dir: impl AsRef<Path>, network: &str) -> anyhow::Result<()> {
         let savepath = save_dir.as_ref().to_path_buf();
         std::fs::create_dir_all(save_dir)?;
 
         let mut savepath = savepath.join(self.id.to_string());
-        savepath.set_extension("json");
+        savepath.set_extension(&format!("{}.json", network));
 
         crate::rpc::tool::write_cred_to_file(&savepath, &self.id, &self.signer.0.secret_key);
 
