@@ -159,6 +159,12 @@ pub struct Contract {
 }
 
 impl Contract {
+    pub fn from_account(acc: Account) -> Self {
+        Self {
+            account: acc,
+        }
+    }
+
     pub(crate) fn new(id: AccountId, signer: InMemorySigner) -> Self {
         Self {
             account: Account::new(id, signer),
